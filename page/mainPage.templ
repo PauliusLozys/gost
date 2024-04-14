@@ -1,0 +1,77 @@
+package mainpage
+
+import "gost/internal/core"
+import "time"
+import "fmt"
+
+templ Page(hasUsername bool) {
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Gost</title>
+			<script src="https://unpkg.com/htmx.org@1.9.11"></script>
+			<link href="./assets/output.css" rel="stylesheet"/>
+		</head>
+		<body class="bg-gradient-to-b from-indigo-500">
+			@MessageScreen(nil)
+			<div class="absolute inset-x-0 bottom-0 h-16">
+				if !hasUsername {
+					@UsernameInput()
+				} else {
+					@MessageInput()
+				}
+			</div>
+		</body>
+	</html>
+}
+
+templ MessageScreen(messages []core.Message) {
+	<div
+		hx-get="/messages"
+		hx-trigger="every 2s"
+		hx-swap="outerHTML"
+		class="h-4/5 overflow-auto no-scrollbar flex flex-col-reverse" 
+	>
+		for _, m := range messages {
+			<div class="text-center py-1 lg:px-4">
+				<div class="p-2 bg-indigo-800 items-center text-indigo-100 leading-none lg:rounded-full flex lg:inline-flex" role="alert">
+					<span class="flex rounded-full bg-indigo-500 uppercase px-2 py-1 text-xs font-bold mr-3">{ fmt.Sprintf("%s|%s", m.CreatedBy, m.CreatedAt.Format(time.DateTime)) }</span>
+					<span class="font-semibold mr-2 text-left flex-auto">{ m.Content }</span>
+				</div>
+			</div>
+		}
+	</div>
+}
+
+templ MessageInput() {
+	<form hx-post="/message">
+		<div class="flex flex-row mb-6 px-10">
+			<input
+				type="text"
+				id="messageBox"
+				name="messageBox"
+				class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+				placeholder="type message here"
+				autocomplete="off"
+				required
+			/>
+		</div>
+	</form>
+}
+
+templ UsernameInput() {
+	<form hx-post="/user">
+		<div class="flex flex-row mb-6 px-10">
+			<input
+				type="text"
+				id="usernameBox"
+				name="usernameBox"
+				class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+				placeholder="Enter your username"
+				autocomplete="off"
+				required
+			/>
+		</div>
+	</form>
+}
