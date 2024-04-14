@@ -1,3 +1,6 @@
 .air.toml
+/cmd/gost/assets/output.css
+/page/*.go
+
 tmp/
 node_modules/
